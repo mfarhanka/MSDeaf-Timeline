@@ -44,6 +44,7 @@
   const adminResetButton = document.getElementById('admin-reset-button');
   const adminEventList = document.getElementById('admin-event-list');
   const adminEventCount = document.getElementById('admin-event-count');
+  const adminSidebarLinks = Array.from(document.querySelectorAll('.admin-sidebar-link[href^="#"]'));
   const desktopBreakpoint = window.matchMedia('(max-width: 700px)');
 
   const state = {
@@ -136,6 +137,72 @@
     adminStatus.dataset.tone = tone || 'neutral';
   }
 
+  function setActiveSidebarLink(targetId) {
+    adminSidebarLinks.forEach(function (link) {
+      const isActive = link.getAttribute('href') === '#' + targetId;
+      link.classList.toggle('is-active', isActive);
+
+      if (isActive) {
+        link.setAttribute('aria-current', 'page');
+      } else {
+        link.removeAttribute('aria-current');
+      }
+    });
+  }
+
+  function scrollToAdminSection(targetId) {
+    const target = document.getElementById(targetId);
+
+    if (!target) {
+      return;
+    }
+
+    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    setActiveSidebarLink(targetId);
+  }
+
+  function handleProtectedAdminNavigation(targetId) {
+    if (state.isAdminAuthenticated) {
+      scrollToAdminSection(targetId);
+      return;
+    }
+
+    scrollToAdminSection('admin-auth-gate');
+    setAdminAuthStatus('Sign in first to access ' + targetId.replace(/-/g, ' ') + '.', 'error');
+
+    if (adminPasswordInput) {
+      adminPasswordInput.focus();
+    }
+  }
+
+  function initializeSidebarNavigation() {
+    if (!adminSidebarLinks.length) {
+      return;
+    }
+
+    adminSidebarLinks.forEach(function (link) {
+      link.addEventListener('click', function (clickEvent) {
+        const href = link.getAttribute('href') || '';
+        const targetId = href.replace(/^#/, '');
+
+        if (!targetId) {
+          return;
+        }
+
+        clickEvent.preventDefault();
+
+        if (targetId === 'admin-auth-gate') {
+          scrollToAdminSection(targetId);
+          return;
+        }
+
+        handleProtectedAdminNavigation(targetId);
+      });
+    });
+
+    setActiveSidebarLink(state.isAdminAuthenticated ? 'admin-console-shell' : 'admin-auth-gate');
+  }
+
   function setAdminConsoleOpen(isOpen) {
     if (!adminPanel) {
       return;
@@ -172,9 +239,12 @@
     if (!state.isAdminAuthenticated) {
       setAdminConsoleOpen(false);
       resetAdminForm();
+      setActiveSidebarLink('admin-auth-gate');
       if (adminPasswordInput) {
         adminPasswordInput.value = '';
       }
+    } else {
+      setActiveSidebarLink('admin-console-shell');
     }
   }
 
@@ -633,6 +703,7 @@
           applyAdminAccessState();
           setAdminAuthStatus('Admin console unlocked for ' + state.authUsername + '.', 'success');
           setAdminStatus('Server session started. Admin changes now save to MySQL.', 'success');
+          scrollToAdminSection('admin-console-shell');
         } catch (error) {
           state.isAdminAuthenticated = false;
           state.authUsername = null;
@@ -822,6 +893,7 @@
   window.addEventListener('resize', layoutTimeline);
   window.addEventListener('load', layoutTimeline);
 
+  initializeSidebarNavigation();
   if (hasAdminUi) {
     initializeAdminEvents();
     Promise.all([loadAdminStatus(), loadTimeline()]);
