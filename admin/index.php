@@ -8,18 +8,26 @@
 </head>
 <body data-api-base="../api/" class="admin-page-body">
 
-  <header class="admin-page-header">
-    <div class="admin-page-header-inner">
-      <a class="admin-page-home-link" href="../index.html">Back to Timeline</a>
-      <p class="admin-console-kicker">Admin Workspace</p>
-      <h1 class="site-title admin-page-title">MSDeaf Timeline Admin</h1>
-      <p class="site-subtitle admin-page-subtitle">Manage timeline events, save directly to MySQL, and preview the public timeline below.</p>
-    </div>
-  </header>
+  <main class="admin-dashboard-layout">
+    <aside class="admin-sidebar" aria-label="Admin navigation">
+      <div class="admin-sidebar-brand">
+        <p class="admin-console-kicker">MSDeaf</p>
+        <h1 class="admin-sidebar-title">Timeline Admin</h1>
+        <p class="admin-sidebar-note">Server-backed content management for the public timeline.</p>
+      </div>
 
-  <main>
-    <section class="timeline-section">
-      <section class="admin-console-shell" aria-label="Timeline admin console">
+      <nav class="admin-sidebar-menu">
+        <a class="admin-sidebar-link" href="#admin-auth-gate">Login</a>
+        <a class="admin-sidebar-link" href="#admin-console-shell">Workspace</a>
+        <a class="admin-sidebar-link" href="#admin-event-form">Event Form</a>
+        <a class="admin-sidebar-link" href="#admin-event-list-section">Event Table</a>
+        <a class="admin-sidebar-link" href="../setup_database.php">DB Setup</a>
+        <a class="admin-sidebar-link admin-sidebar-link-accent" href="../index.html">View Public Timeline</a>
+      </nav>
+    </aside>
+
+    <section class="admin-dashboard-content">
+      <section class="admin-console-shell" id="admin-console-shell" aria-label="Timeline admin console">
         <div class="admin-auth-gate" id="admin-auth-gate">
           <div class="admin-auth-copy">
             <p class="admin-console-kicker">Admin Access</p>
@@ -105,7 +113,7 @@
                 </div>
               </form>
 
-              <section class="admin-event-list-panel" aria-labelledby="admin-event-list-title">
+              <section class="admin-event-list-panel" id="admin-event-list-section" aria-labelledby="admin-event-list-title">
                 <div class="admin-event-list-header">
                   <div>
                     <h3 class="admin-event-list-title" id="admin-event-list-title">Current Events</h3>
@@ -120,12 +128,6 @@
         </div>
       </section>
 
-      <div class="timeline-year-nav" id="timeline-year-nav" aria-label="Jump to timeline year">
-        <!-- Year jump buttons will be injected by script.js -->
-      </div>
-      <div class="timeline-container" id="timeline-container">
-        <!-- Timeline items will be injected by script.js -->
-      </div>
     </section>
   </main>
 

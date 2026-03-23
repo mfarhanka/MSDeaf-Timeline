@@ -24,6 +24,76 @@ body {
   min-height: 100vh;
 }
 
+.admin-dashboard-layout {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 2rem 1rem 3rem;
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+  gap: 1.25rem;
+  align-items: start;
+}
+
+.admin-sidebar {
+  position: sticky;
+  top: 1.25rem;
+  padding: 1.25rem;
+  background: rgba(8, 19, 32, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 22px;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.26);
+}
+
+.admin-sidebar-brand {
+  margin-bottom: 1.25rem;
+}
+
+.admin-sidebar-title {
+  font-size: 1.8rem;
+  line-height: 1.1;
+  color: #f2f6fb;
+  margin-bottom: 0.5rem;
+}
+
+.admin-sidebar-note {
+  color: #8aaccc;
+  font-size: 0.9rem;
+}
+
+.admin-sidebar-menu {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.admin-sidebar-link {
+  display: block;
+  padding: 0.8rem 0.95rem;
+  border-radius: 14px;
+  background: rgba(20, 35, 51, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  color: #c8d8ee;
+  text-decoration: none;
+  font-weight: 700;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.admin-sidebar-link:hover,
+.admin-sidebar-link:focus-visible {
+  background: #1565c0;
+  border-color: #1976d2;
+  color: #fff;
+  transform: translateY(-1px);
+  outline: none;
+}
+
+.admin-sidebar-link-accent {
+  border-color: rgba(21, 101, 192, 0.35);
+}
+
+.admin-dashboard-content {
+  min-width: 0;
+}
+
 /* ---------- Header ---------- */
 .site-header {
   min-height: 100vh;
@@ -122,17 +192,6 @@ body {
   padding: 5rem 1rem 6rem;
 }
 
-.admin-page-header {
-  padding: 3rem 1.5rem 1.5rem;
-  background: linear-gradient(180deg, #0d1b2a 0%, #102338 100%);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-.admin-page-header-inner {
-  max-width: 960px;
-  margin: 0 auto;
-}
-
 .admin-page-home-link,
 .footer-admin-link {
   display: inline-flex;
@@ -143,10 +202,6 @@ body {
   font-weight: 700;
 }
 
-.admin-page-home-link {
-  margin-bottom: 1rem;
-}
-
 .admin-page-home-link:hover,
 .admin-page-home-link:focus-visible,
 .footer-admin-link:hover,
@@ -155,18 +210,9 @@ body {
   outline: none;
 }
 
-.admin-page-title {
-  font-size: clamp(2rem, 4vw, 3rem);
-  margin-bottom: 0.5rem;
-}
-
-.admin-page-subtitle {
-  max-width: 46rem;
-}
-
 .admin-console-shell {
-  max-width: 960px;
-  margin: 0 auto 2rem;
+  max-width: none;
+  margin: 0;
 }
 
 .admin-auth-gate {
@@ -429,11 +475,9 @@ body {
 }
 
 .admin-event-list {
-  display: grid;
-  gap: 0.75rem;
+  overflow-x: auto;
 }
 
-.admin-event-card,
 .admin-empty-state {
   border: 1px solid rgba(255, 255, 255, 0.07);
   border-radius: 16px;
@@ -444,6 +488,53 @@ body {
 .admin-empty-state {
   color: #8aaccc;
   text-align: center;
+}
+
+.admin-event-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 760px;
+}
+
+.admin-event-table th,
+.admin-event-table td {
+  padding: 0.85rem 0.8rem;
+  text-align: left;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  vertical-align: top;
+}
+
+.admin-event-table th {
+  color: #9ab4d4;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.admin-event-table td {
+  color: #d7e6f5;
+  font-size: 0.9rem;
+}
+
+.admin-event-table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.admin-event-table-title {
+  color: #f2f6fb;
+  font-weight: 700;
+  margin-bottom: 0.2rem;
+}
+
+.admin-event-table-description {
+  color: #8aaccc;
+  line-height: 1.5;
+  max-width: 30rem;
+}
+
+.admin-event-actions-cell {
+  min-width: 240px;
 }
 
 .admin-event-order {
@@ -727,6 +818,15 @@ body {
 /* ---------- Responsive ---------- */
 @media (max-width: 700px) {
   /* Switch to single-column left-aligned layout */
+  .admin-dashboard-layout {
+    grid-template-columns: 1fr;
+    padding: 1rem 1rem 2rem;
+  }
+
+  .admin-sidebar {
+    position: static;
+  }
+
   .admin-console-bar,
   .admin-auth-form,
   .admin-console-toolbar,
@@ -738,6 +838,10 @@ body {
 
   .admin-console-grid {
     grid-template-columns: 1fr;
+  }
+
+  .admin-event-table {
+    min-width: 640px;
   }
 
   .admin-console-actions,

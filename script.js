@@ -7,6 +7,7 @@
 
   const apiBase = document.body.dataset.apiBase || 'api/';
   const hasAdminUi = Boolean(document.getElementById('admin-auth-gate') || document.getElementById('admin-console-protected'));
+  const isAdminPage = document.body.classList.contains('admin-page-body');
 
   const API = {
     timeline: apiBase + 'timeline.php',
@@ -222,7 +223,9 @@
       poweredByName.textContent = state.meta.organization;
     }
 
-    document.title = state.meta.title + ' | MSDeaf Timeline';
+    if (!isAdminPage) {
+      document.title = state.meta.title + ' | MSDeaf Timeline';
+    }
   }
 
   function createPlaceholder(year) {
@@ -332,28 +335,48 @@
       return;
     }
 
+    const table = document.createElement('table');
+    table.classList.add('admin-event-table');
+
+    const thead = document.createElement('thead');
+    const headRow = document.createElement('tr');
+
+    ['Order', 'Year / Date', 'Title / Description', 'Image', 'Actions'].forEach(function (heading) {
+      const th = document.createElement('th');
+      th.scope = 'col';
+      th.textContent = heading;
+      headRow.appendChild(th);
+    });
+
+    thead.appendChild(headRow);
+    table.appendChild(thead);
+
+    const tbody = document.createElement('tbody');
+
     state.events.forEach(function (event, index) {
-      const card = document.createElement('article');
-      card.classList.add('admin-event-card');
+      const row = document.createElement('tr');
 
-      const order = document.createElement('p');
-      order.classList.add('admin-event-order');
-      order.textContent = 'Item ' + (index + 1);
+      const orderCell = document.createElement('td');
+      orderCell.textContent = String(index + 1);
 
-      const meta = document.createElement('p');
-      meta.classList.add('admin-event-meta');
-      meta.textContent = event.year + (event.date && event.date !== event.year ? ' • ' + event.date : '');
+      const dateCell = document.createElement('td');
+      dateCell.textContent = event.year + (event.date && event.date !== event.year ? ' / ' + event.date : '');
 
-      const title = document.createElement('h4');
-      title.classList.add('admin-event-name');
+      const infoCell = document.createElement('td');
+      const title = document.createElement('div');
+      title.classList.add('admin-event-table-title');
       title.textContent = event.title;
+      const description = document.createElement('div');
+      description.classList.add('admin-event-table-description');
+      description.textContent = event.description.length > 180 ? event.description.slice(0, 177) + '...' : event.description;
+      infoCell.appendChild(title);
+      infoCell.appendChild(description);
 
-      const description = document.createElement('p');
-      description.classList.add('admin-event-description');
-      description.textContent = event.description.length > 150 ? event.description.slice(0, 147) + '...' : event.description;
+      const imageCell = document.createElement('td');
+      imageCell.textContent = event.image || 'No image';
 
-      const actions = document.createElement('div');
-      actions.classList.add('admin-event-actions');
+      const actionsCell = document.createElement('td');
+      actionsCell.classList.add('admin-event-actions', 'admin-event-actions-cell');
 
       [
         { action: 'edit', label: 'Edit', classes: '' },
@@ -371,19 +394,26 @@
         button.dataset.eventId = event.id;
         button.textContent = actionConfig.label;
         button.disabled = Boolean(actionConfig.disabled);
-        actions.appendChild(button);
+        actionsCell.appendChild(button);
       });
 
-      card.appendChild(order);
-      card.appendChild(meta);
-      card.appendChild(title);
-      card.appendChild(description);
-      card.appendChild(actions);
-      adminEventList.appendChild(card);
+      row.appendChild(orderCell);
+      row.appendChild(dateCell);
+      row.appendChild(infoCell);
+      row.appendChild(imageCell);
+      row.appendChild(actionsCell);
+      tbody.appendChild(row);
     });
+
+    table.appendChild(tbody);
+    adminEventList.appendChild(table);
   }
 
   function layoutTimeline() {
+    if (!container) {
+      return;
+    }
+
     const items = Array.from(container.querySelectorAll('.timeline-item'));
 
     container.style.height = '';
@@ -429,6 +459,10 @@
   }
 
   function setupScrollReveal() {
+    if (!container) {
+      return;
+    }
+
     const items = container.querySelectorAll('.timeline-item');
 
     if ('IntersectionObserver' in window) {
@@ -455,6 +489,10 @@
   }
 
   function renderTimeline() {
+    if (!container) {
+      return;
+    }
+
     container.innerHTML = '';
 
     if (state.events.length === 0) {
@@ -499,7 +537,9 @@
   }
 
   async function loadTimeline() {
-    container.innerHTML = '<p class="timeline-loading">Loading timeline…</p>';
+    if (container) {
+      container.innerHTML = '<p class="timeline-loading">Loading timeline…</p>';
+    }
 
     try {
       const payload = await apiFetch(API.timeline);
@@ -508,8 +548,10 @@
       resetAdminForm();
       setAdminStatus('Connected to MySQL timeline data.', 'success');
     } catch (error) {
-      container.style.height = '';
-      container.innerHTML = '<p class="timeline-error">Failed to load timeline from MySQL. Run setup_database.php and check your MySQL connection.</p>';
+      if (container) {
+        container.style.height = '';
+        container.innerHTML = '<p class="timeline-error">Failed to load timeline from MySQL. Run setup_database.php and check your MySQL connection.</p>';
+      }
       setAdminStatus(error.message || 'Timeline data could not be loaded.', 'error');
     }
   }
