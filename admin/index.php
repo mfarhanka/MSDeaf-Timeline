@@ -17,10 +17,10 @@
       </div>
 
       <nav class="admin-sidebar-menu">
-        <a class="admin-sidebar-link" href="#admin-auth-gate">Login</a>
-        <a class="admin-sidebar-link" href="#admin-console-shell">Workspace</a>
-        <a class="admin-sidebar-link" href="#admin-event-form">Event Form</a>
-        <a class="admin-sidebar-link" href="#admin-event-list-section">Event Table</a>
+        <a class="admin-sidebar-link" data-admin-public-link href="#admin-login-panel">Login</a>
+        <a class="admin-sidebar-link" data-admin-protected-link href="#admin-workspace-panel" hidden>Workspace</a>
+        <a class="admin-sidebar-link" data-admin-protected-link href="#admin-event-form-panel" hidden>Event Form</a>
+        <a class="admin-sidebar-link" data-admin-protected-link href="#admin-event-table-panel" hidden>Event Table</a>
         <a class="admin-sidebar-link" href="../setup_database.php">DB Setup</a>
         <a class="admin-sidebar-link admin-sidebar-link-accent" href="../index.html">View Public Timeline</a>
       </nav>
@@ -34,7 +34,7 @@
 
     <section class="admin-dashboard-content">
       <section class="admin-console-shell" id="admin-console-shell" aria-label="Timeline admin console">
-        <div class="admin-auth-gate" id="admin-auth-gate">
+        <div class="admin-auth-gate admin-tab-panel" id="admin-login-panel" data-admin-tab-panel>
           <div class="admin-auth-copy">
             <p class="admin-console-kicker">Admin Access</p>
             <h2 class="admin-console-title">Protected Timeline Manager</h2>
@@ -52,7 +52,7 @@
         </div>
 
         <div class="admin-console-protected" id="admin-console-protected" data-admin-protected hidden>
-          <div class="admin-console-panel" id="admin-console-panel">
+          <section class="admin-console-panel admin-tab-panel" id="admin-workspace-panel" data-admin-tab-panel hidden>
             <div class="admin-console-toolbar">
               <p class="admin-console-status" id="admin-console-status" aria-live="polite">Connected to the server timeline.</p>
               <div class="admin-console-actions">
@@ -62,63 +62,66 @@
               </div>
             </div>
 
-            <div class="admin-console-grid">
-              <form class="admin-form" id="admin-event-form">
-                <div class="admin-form-header">
-                  <h3 class="admin-form-title" id="admin-form-title">Create Event</h3>
-                  <p class="admin-form-note">Add a new timeline item or edit an existing one. The display order follows the list on the right.</p>
-                </div>
-
-                <input type="hidden" id="admin-event-id" name="eventId" />
-
-                <div class="admin-field">
-                  <label for="admin-year">Year</label>
-                  <input id="admin-year" name="year" type="text" required />
-                </div>
-
-                <div class="admin-field">
-                  <label for="admin-date">Date Label</label>
-                  <input id="admin-date" name="date" type="text" placeholder="Example: August 1977" />
-                </div>
-
-                <div class="admin-field">
-                  <label for="admin-title">Title</label>
-                  <input id="admin-title" name="title" type="text" required />
-                </div>
-
-                <div class="admin-field">
-                  <label for="admin-description">Description</label>
-                  <textarea id="admin-description" name="description" rows="6" required></textarea>
-                </div>
-
-                <div class="admin-field">
-                  <label for="admin-image">Image Path</label>
-                  <input id="admin-image" name="image" type="text" placeholder="images/example.jpg" />
-                </div>
-
-                <div class="admin-field">
-                  <label for="admin-image-alt">Image Alt Text</label>
-                  <input id="admin-image-alt" name="imageAlt" type="text" placeholder="Describe the image" />
-                </div>
-
-                <div class="admin-form-actions">
-                  <button class="admin-console-action" id="admin-save-button" type="submit">Add Event</button>
-                  <button class="admin-console-action secondary" id="admin-cancel-edit-button" type="button" hidden>Cancel Edit</button>
-                </div>
-              </form>
-
-              <section class="admin-event-list-panel" id="admin-event-list-section" aria-labelledby="admin-event-list-title">
-                <div class="admin-event-list-header">
-                  <div>
-                    <h3 class="admin-event-list-title" id="admin-event-list-title">Current Events</h3>
-                    <p class="admin-event-list-note">Reorder items to change how the timeline alternates left and right.</p>
-                  </div>
-                  <p class="admin-event-count" id="admin-event-count">0 events</p>
-                </div>
-                <div class="admin-event-list" id="admin-event-list"></div>
-              </section>
+            <div class="admin-workspace-note">
+              <h2 class="admin-form-title">Workspace</h2>
+              <p class="admin-form-note">Use the sidebar tabs to switch between the event form and the event table. This page writes directly to the MySQL-backed timeline.</p>
             </div>
-          </div>
+          </section>
+
+          <form class="admin-form admin-tab-panel" id="admin-event-form-panel" data-admin-tab-panel hidden>
+            <div class="admin-form-header">
+              <h3 class="admin-form-title" id="admin-form-title">Create Event</h3>
+              <p class="admin-form-note">Add a new timeline item or edit an existing one. The display order follows the list in the Event Table tab.</p>
+            </div>
+
+            <input type="hidden" id="admin-event-id" name="eventId" />
+
+            <div class="admin-field">
+              <label for="admin-year">Year</label>
+              <input id="admin-year" name="year" type="text" required />
+            </div>
+
+            <div class="admin-field">
+              <label for="admin-date">Date Label</label>
+              <input id="admin-date" name="date" type="text" placeholder="Example: August 1977" />
+            </div>
+
+            <div class="admin-field">
+              <label for="admin-title">Title</label>
+              <input id="admin-title" name="title" type="text" required />
+            </div>
+
+            <div class="admin-field">
+              <label for="admin-description">Description</label>
+              <textarea id="admin-description" name="description" rows="6" required></textarea>
+            </div>
+
+            <div class="admin-field">
+              <label for="admin-image">Image Path</label>
+              <input id="admin-image" name="image" type="text" placeholder="images/example.jpg" />
+            </div>
+
+            <div class="admin-field">
+              <label for="admin-image-alt">Image Alt Text</label>
+              <input id="admin-image-alt" name="imageAlt" type="text" placeholder="Describe the image" />
+            </div>
+
+            <div class="admin-form-actions">
+              <button class="admin-console-action" id="admin-save-button" type="submit">Add Event</button>
+              <button class="admin-console-action secondary" id="admin-cancel-edit-button" type="button" hidden>Cancel Edit</button>
+            </div>
+          </form>
+
+          <section class="admin-event-list-panel admin-tab-panel" id="admin-event-table-panel" data-admin-tab-panel hidden aria-labelledby="admin-event-list-title">
+            <div class="admin-event-list-header">
+              <div>
+                <h3 class="admin-event-list-title" id="admin-event-list-title">Current Events</h3>
+                <p class="admin-event-list-note">Reorder items to change how the timeline alternates left and right.</p>
+              </div>
+              <p class="admin-event-count" id="admin-event-count">0 events</p>
+            </div>
+            <div class="admin-event-list" id="admin-event-list"></div>
+          </section>
         </div>
       </section>
 

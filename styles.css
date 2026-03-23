@@ -101,6 +101,10 @@ body {
   min-width: 0;
 }
 
+.admin-sidebar-link[hidden] {
+  display: none;
+}
+
 .admin-sidebar-session {
   padding-top: 1.1rem;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
@@ -246,6 +250,15 @@ body {
   margin: 0;
 }
 
+.admin-console-protected {
+  display: grid;
+  gap: 1rem;
+}
+
+.admin-tab-panel[hidden] {
+  display: none !important;
+}
+
 .admin-auth-gate {
   padding: 1.25rem 1.3rem;
   background: rgba(8, 19, 32, 0.82);
@@ -384,6 +397,11 @@ body {
   box-shadow: 0 14px 36px rgba(0, 0, 0, 0.28);
 }
 
+.admin-workspace-note {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding-top: 1rem;
+}
+
 .admin-console-toolbar {
   display: flex;
   align-items: center;
@@ -414,13 +432,6 @@ body {
   flex-wrap: wrap;
   justify-content: flex-end;
   gap: 0.75rem;
-}
-
-.admin-console-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 380px) minmax(0, 1fr);
-  gap: 1rem;
-  align-items: start;
 }
 
 .admin-form,
@@ -865,10 +876,6 @@ body {
   .admin-console-bar-actions {
     flex-direction: column;
     align-items: stretch;
-  }
-
-  .admin-console-grid {
-    grid-template-columns: 1fr;
   }
 
   .admin-event-table {

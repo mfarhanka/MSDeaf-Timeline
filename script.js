@@ -6,7 +6,7 @@
   'use strict';
 
   const apiBase = document.body.dataset.apiBase || 'api/';
-  const hasAdminUi = Boolean(document.getElementById('admin-auth-gate') || document.getElementById('admin-console-protected'));
+  const hasAdminUi = Boolean(document.getElementById('admin-login-panel') || document.getElementById('admin-console-protected'));
   const isAdminPage = document.body.classList.contains('admin-page-body');
   const adminProtectedSections = Array.from(document.querySelectorAll('[data-admin-protected]'));
 
@@ -25,16 +25,16 @@
   const poweredByName = document.querySelector('.powered-by strong');
   const container = document.getElementById('timeline-container');
   const yearNav = document.getElementById('timeline-year-nav');
-  const adminAuthGate = document.getElementById('admin-auth-gate');
+  const adminAuthGate = document.getElementById('admin-login-panel');
   const adminAuthForm = document.getElementById('admin-auth-form');
   const adminAuthStatus = document.getElementById('admin-auth-status');
   const adminPasswordInput = document.getElementById('admin-password');
   const adminProtected = document.getElementById('admin-console-protected');
   const adminToggle = document.getElementById('admin-console-toggle');
   const adminLogoutButton = document.getElementById('admin-logout-button');
-  const adminPanel = document.getElementById('admin-console-panel');
+  const adminPanel = document.getElementById('admin-workspace-panel');
   const adminStatus = document.getElementById('admin-console-status');
-  const adminForm = document.getElementById('admin-event-form');
+  const adminForm = document.getElementById('admin-event-form-panel');
   const adminFormTitle = document.getElementById('admin-form-title');
   const adminEventIdInput = document.getElementById('admin-event-id');
   const adminSaveButton = document.getElementById('admin-save-button');
@@ -45,6 +45,9 @@
   const adminEventList = document.getElementById('admin-event-list');
   const adminEventCount = document.getElementById('admin-event-count');
   const adminSidebarLinks = Array.from(document.querySelectorAll('.admin-sidebar-link[href^="#"]'));
+  const adminTabPanels = Array.from(document.querySelectorAll('[data-admin-tab-panel]'));
+  const adminPublicLinks = Array.from(document.querySelectorAll('[data-admin-public-link]'));
+  const adminProtectedLinks = Array.from(document.querySelectorAll('[data-admin-protected-link]'));
   const desktopBreakpoint = window.matchMedia('(max-width: 700px)');
 
   const state = {
@@ -150,24 +153,31 @@
     });
   }
 
-  function scrollToAdminSection(targetId) {
+  function activateAdminTab(targetId) {
     const target = document.getElementById(targetId);
 
-    if (!target) {
+    if (!target || !target.hasAttribute('data-admin-tab-panel')) {
       return;
     }
 
-    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    adminTabPanels.forEach(function (panel) {
+      panel.hidden = panel.id !== targetId;
+    });
+
     setActiveSidebarLink(targetId);
   }
 
-  function handleProtectedAdminNavigation(targetId) {
+  function openAdminTab(targetId) {
     if (state.isAdminAuthenticated) {
-      scrollToAdminSection(targetId);
+      if (targetId === 'admin-login-panel') {
+        activateAdminTab('admin-workspace-panel');
+      } else {
+        activateAdminTab(targetId);
+      }
       return;
     }
 
-    scrollToAdminSection('admin-auth-gate');
+    activateAdminTab('admin-login-panel');
     setAdminAuthStatus('Sign in first to access ' + targetId.replace(/-/g, ' ') + '.', 'error');
 
     if (adminPasswordInput) {
@@ -191,16 +201,11 @@
 
         clickEvent.preventDefault();
 
-        if (targetId === 'admin-auth-gate') {
-          scrollToAdminSection(targetId);
-          return;
-        }
-
-        handleProtectedAdminNavigation(targetId);
+        openAdminTab(targetId);
       });
     });
 
-    setActiveSidebarLink(state.isAdminAuthenticated ? 'admin-console-shell' : 'admin-auth-gate');
+    activateAdminTab(state.isAdminAuthenticated ? 'admin-workspace-panel' : 'admin-login-panel');
   }
 
   function setAdminConsoleOpen(isOpen) {
@@ -236,15 +241,24 @@
       section.hidden = !state.isAdminAuthenticated;
     });
 
+    adminPublicLinks.forEach(function (link) {
+      link.hidden = state.isAdminAuthenticated;
+    });
+
+    adminProtectedLinks.forEach(function (link) {
+      link.hidden = !state.isAdminAuthenticated;
+    });
+
     if (!state.isAdminAuthenticated) {
       setAdminConsoleOpen(false);
       resetAdminForm();
-      setActiveSidebarLink('admin-auth-gate');
+      activateAdminTab('admin-login-panel');
       if (adminPasswordInput) {
         adminPasswordInput.value = '';
       }
     } else {
-      setActiveSidebarLink('admin-console-shell');
+      setAdminConsoleOpen(true);
+      activateAdminTab('admin-workspace-panel');
     }
   }
 
@@ -278,7 +292,7 @@
     adminFormTitle.textContent = 'Edit Event';
     adminSaveButton.textContent = 'Update Event';
     adminCancelEditButton.hidden = false;
-    setAdminConsoleOpen(true);
+    openAdminTab('admin-event-form-panel');
   }
 
   function applyTimelinePayload(payload) {
@@ -703,7 +717,7 @@
           applyAdminAccessState();
           setAdminAuthStatus('Admin console unlocked for ' + state.authUsername + '.', 'success');
           setAdminStatus('Server session started. Admin changes now save to MySQL.', 'success');
-          scrollToAdminSection('admin-console-shell');
+          openAdminTab('admin-workspace-panel');
         } catch (error) {
           state.isAdminAuthenticated = false;
           state.authUsername = null;
@@ -739,8 +753,8 @@
     if (adminNewEventButton) {
       adminNewEventButton.addEventListener('click', function () {
         resetAdminForm();
-        setAdminConsoleOpen(true);
         setAdminStatus('Ready to create a new event.', 'neutral');
+        openAdminTab('admin-event-form-panel');
       });
     }
 
@@ -748,6 +762,7 @@
       adminCancelEditButton.addEventListener('click', function () {
         resetAdminForm();
         setAdminStatus('Edit cancelled.', 'neutral');
+        openAdminTab('admin-event-table-panel');
       });
     }
 
@@ -770,6 +785,7 @@
           renderApplication();
           resetAdminForm();
           setAdminStatus(response.message || 'Timeline reset successfully.', 'warning');
+          openAdminTab('admin-event-table-panel');
         } catch (error) {
           setAdminStatus(error.message || 'Reset failed.', 'error');
         }
@@ -813,6 +829,7 @@
         try {
           await saveTimelineToServer(isEditing ? 'Event updated successfully in MySQL.' : 'Event added successfully to MySQL.');
           resetAdminForm();
+          openAdminTab('admin-event-table-panel');
         } catch (error) {
           setAdminStatus(error.message || 'Save failed.', 'error');
           await loadTimeline();
@@ -855,6 +872,7 @@
 
           try {
             await saveTimelineToServer('Event deleted successfully from MySQL.');
+            openAdminTab('admin-event-table-panel');
           } catch (error) {
             setAdminStatus(error.message || 'Delete failed.', 'error');
             await loadTimeline();
@@ -868,6 +886,7 @@
 
           try {
             await saveTimelineToServer('Event order updated in MySQL.');
+            openAdminTab('admin-event-table-panel');
           } catch (error) {
             setAdminStatus(error.message || 'Reorder failed.', 'error');
             await loadTimeline();
@@ -881,6 +900,7 @@
 
           try {
             await saveTimelineToServer('Event order updated in MySQL.');
+            openAdminTab('admin-event-table-panel');
           } catch (error) {
             setAdminStatus(error.message || 'Reorder failed.', 'error');
             await loadTimeline();
