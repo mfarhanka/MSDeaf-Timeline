@@ -12,20 +12,18 @@
   }
 
   const container = document.getElementById('timeline-container');
+  const desktopBreakpoint = window.matchMedia('(max-width: 700px)');
 
   /**
-   * Build and insert a single timeline item card into the container.
-   * @param {Object} event  - One event object from data.json
-   * @param {number} index  - Index in the events array (0-based)
+   * Build a single timeline item card.
+   * @param {Object} event - One event object from data.json
+   * @param {string} side  - left or right
+   * @returns {HTMLElement}
    */
-  function buildTimelineItem(event, index) {
+  function buildTimelineItem(event, side) {
     const item = document.createElement('div');
     item.classList.add('timeline-item');
-
-    // Alternate sides: even index → left (default), odd index → right
-    if (index % 2 !== 0) {
-      item.classList.add('right');
-    }
+    item.classList.add(side);
 
     // Card
     const card = document.createElement('div');
@@ -70,7 +68,7 @@
     body.appendChild(desc);
     card.appendChild(body);
     item.appendChild(card);
-    container.appendChild(item);
+    return item;
   }
 
   /**
@@ -93,6 +91,61 @@
     placeholder.appendChild(yearEl);
     placeholder.appendChild(labelEl);
     return placeholder;
+  }
+
+  /**
+   * Position timeline items independently on each side for desktop layouts.
+   */
+  function layoutTimeline() {
+    const items = Array.from(container.querySelectorAll('.timeline-item'));
+
+    container.style.height = '';
+
+    items.forEach(function (item) {
+      item.style.top = '';
+    });
+
+    if (desktopBreakpoint.matches) {
+      return;
+    }
+
+    let leftOffset = 0;
+    let rightOffset = 6 * 16;
+    const itemGap = 64;
+    const crossColumnGap = 120;
+    let lastLeftTop = null;
+    let lastRightTop = null;
+
+    items.forEach(function (item) {
+      const isRight = item.classList.contains('right');
+      let nextTop = isRight ? rightOffset : leftOffset;
+
+      if (isRight && lastLeftTop !== null && nextTop < lastLeftTop + crossColumnGap) {
+        nextTop = lastLeftTop + crossColumnGap;
+      }
+
+      if (!isRight && lastRightTop !== null && nextTop < lastRightTop + crossColumnGap) {
+        nextTop = lastRightTop + crossColumnGap;
+      }
+
+      item.style.top = nextTop + 'px';
+
+      if (isRight) {
+        lastRightTop = nextTop;
+        rightOffset += item.offsetHeight + itemGap;
+      } else {
+        lastLeftTop = nextTop;
+        leftOffset += item.offsetHeight + itemGap;
+      }
+
+      if (isRight) {
+        rightOffset = Math.max(rightOffset, nextTop + item.offsetHeight + itemGap);
+      } else {
+        leftOffset = Math.max(leftOffset, nextTop + item.offsetHeight + itemGap);
+      }
+    });
+
+    container.style.height = Math.max(leftOffset, rightOffset) - itemGap + 'px';
   }
 
   /**
@@ -148,13 +201,15 @@
           return;
         }
 
-        // Build each timeline item
+        // Alternate sides, but allow CSS to offset right-side cards slightly upward.
         data.events.forEach(function (event, index) {
-          buildTimelineItem(event, index);
+          const side = index % 2 === 0 ? 'left' : 'right';
+          container.appendChild(buildTimelineItem(event, side));
         });
 
         // Activate scroll-reveal after items are in the DOM
         setupScrollReveal();
+        requestAnimationFrame(layoutTimeline);
       })
       .catch(function (err) {
         container.innerHTML =
@@ -162,6 +217,9 @@
         console.error('Timeline load error:', err);
       });
   }
+
+  window.addEventListener('resize', layoutTimeline);
+  window.addEventListener('load', layoutTimeline);
 
   // Kick off
   loadTimeline();
