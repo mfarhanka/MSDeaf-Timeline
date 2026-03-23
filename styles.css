@@ -20,6 +20,10 @@ body {
   line-height: 1.6;
 }
 
+.admin-page-body {
+  min-height: 100vh;
+}
+
 /* ---------- Header ---------- */
 .site-header {
   min-height: 100vh;
@@ -116,6 +120,48 @@ body {
 /* ---------- Timeline Section ---------- */
 .timeline-section {
   padding: 5rem 1rem 6rem;
+}
+
+.admin-page-header {
+  padding: 3rem 1.5rem 1.5rem;
+  background: linear-gradient(180deg, #0d1b2a 0%, #102338 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.admin-page-header-inner {
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.admin-page-home-link,
+.footer-admin-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: #8fc7ff;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.admin-page-home-link {
+  margin-bottom: 1rem;
+}
+
+.admin-page-home-link:hover,
+.admin-page-home-link:focus-visible,
+.footer-admin-link:hover,
+.footer-admin-link:focus-visible {
+  color: #c8e3ff;
+  outline: none;
+}
+
+.admin-page-title {
+  font-size: clamp(2rem, 4vw, 3rem);
+  margin-bottom: 0.5rem;
+}
+
+.admin-page-subtitle {
+  max-width: 46rem;
 }
 
 .admin-console-shell {
@@ -645,6 +691,10 @@ body {
   padding: 1.5rem 1rem;
   font-size: 0.85rem;
   border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.site-footer p + p {
+  margin-top: 0.65rem;
 }
 
 /* ---------- Loading State ---------- */

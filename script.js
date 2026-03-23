@@ -5,13 +5,16 @@
 (function () {
   'use strict';
 
+  const apiBase = document.body.dataset.apiBase || 'api/';
+  const hasAdminUi = Boolean(document.getElementById('admin-auth-gate') || document.getElementById('admin-console-protected'));
+
   const API = {
-    timeline: 'api/timeline.php',
-    adminStatus: 'api/admin-status.php',
-    adminLogin: 'api/admin-login.php',
-    adminLogout: 'api/admin-logout.php',
-    adminSave: 'api/admin-save.php',
-    adminReset: 'api/admin-reset.php'
+    timeline: apiBase + 'timeline.php',
+    adminStatus: apiBase + 'admin-status.php',
+    adminLogin: apiBase + 'admin-login.php',
+    adminLogout: apiBase + 'admin-logout.php',
+    adminSave: apiBase + 'admin-save.php',
+    adminReset: apiBase + 'admin-reset.php'
   };
 
   const footerYear = document.getElementById('footer-year');
@@ -769,6 +772,10 @@
   window.addEventListener('resize', layoutTimeline);
   window.addEventListener('load', layoutTimeline);
 
-  initializeAdminEvents();
-  Promise.all([loadAdminStatus(), loadTimeline()]);
+  if (hasAdminUi) {
+    initializeAdminEvents();
+    Promise.all([loadAdminStatus(), loadTimeline()]);
+  } else {
+    loadTimeline();
+  }
 })();

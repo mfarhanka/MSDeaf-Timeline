@@ -14,6 +14,8 @@ This project now uses PHP and MySQL for timeline storage.
 Run the setup page in your browser after Apache and MySQL are running:
 
 - `http://localhost/MSDeaf-Timeline/setup_database.php`
+- Public timeline page: `http://localhost/MSDeaf-Timeline/index.html`
+- Admin page: `http://localhost/MSDeaf-Timeline/admin/index.php`
 
 What the setup page does:
 
@@ -24,7 +26,11 @@ What the setup page does:
 
 ## Admin Console
 
-The site includes an admin console for managing timeline events through PHP APIs and MySQL.
+The admin console is now separated from the public timeline page and lives in the `admin/` folder.
+
+- Public visitors use the timeline page only
+- Admin users sign in on the dedicated admin page
+- The admin page still includes a live timeline preview below the form
 
 - Add new events
 - Edit existing events
